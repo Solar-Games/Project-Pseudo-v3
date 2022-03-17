@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="res"/>
+	<classpathentry kind="lib" path="C:/Users/Latitude E6430/Projects/Game Engine/out/jar/SJEngine_Library/SJEngine Library.jar" sourcepath="C:/Users/Latitude E6430/Projects/Game Engine/src"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
