@@ -7,6 +7,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="res"/>
-	<classpathentry kind="lib" path="C:/Users/Latitude E6430/Projects/Game Engine/out/jar/SJEngine_Library/SJEngine Library.jar" sourcepath="C:/Users/Latitude E6430/Projects/Game Engine/src"/>
+	<classpathentry kind="lib" path="C:/Users/Latitude E6430/Projects/Project-Pseudo-v3/lib/SJEngine Library.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
