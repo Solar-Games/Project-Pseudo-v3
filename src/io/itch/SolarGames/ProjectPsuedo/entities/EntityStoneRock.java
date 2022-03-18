@@ -28,7 +28,6 @@ public class EntityStoneRock extends EntityRock {
 			
 			if (e instanceof Player) {
 			
-				boolean hasItemWood = false;
 				Player player = ((Player) e);
 				
 				player.giveItem(this.item, 5);

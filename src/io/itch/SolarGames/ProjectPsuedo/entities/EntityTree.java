@@ -33,7 +33,6 @@ public class EntityTree extends Entity {
 			
 			if (e instanceof Player) {
 			
-				boolean hasItemWood = false;
 				Player player = ((Player) e);
 				
 				player.giveItem(Item.wood, 5);
