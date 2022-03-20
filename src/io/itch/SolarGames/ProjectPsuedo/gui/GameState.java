@@ -26,7 +26,7 @@ import me.sjplus.SJEngine.util.*;
 
 public class GameState extends Screen {
 
-	public static Render2D render3D;
+	public static GameRenderer renderer;
 	public static Camera cam;
 	
 	private Level lvl;
@@ -58,7 +58,7 @@ public class GameState extends Screen {
 	
 		super(width, height);
 
-		render3D = new Render2D(width, height);
+		renderer = new Render3D(width, height);
 		cam = new Camera(0, 0, 0, 0, 0, (float) (height * Math.tanh(Math.toRadians(135))));
 		
 		cam.setPostion(0, 12, 0);
@@ -96,71 +96,21 @@ public class GameState extends Screen {
 				sin = Math.sin(Math.toRadians(cam.rotation.x));
 		
 		cam.setPostion(cam.position.x, 2.25 + block.getBlockHeight(), cam.position.z);
-		cam.setRotation(-0, (float) (30 - -block.getBlockHeight()));
+		cam.setRotation(cam.rotation.x, (float) (30 - -block.getBlockHeight()));
 		
 		lvl.updateLevel(cam);
 		
 		if (GameDisplay.screenState != ScreenState.INVENTORY_STATE) {
 
-			double xAng = (strafe * block.getWalkSpeed() * cos + forward * block.getWalkSpeed() * sin);
-			double zAng = (forward * block.getWalkSpeed() * cos - strafe * block.getWalkSpeed() * sin);
+			double speed = block.getWalkSpeed() + player.speed;
+			
+			double xAng = (strafe * speed * cos + forward * speed * sin);
+			double zAng = (forward * speed * cos - strafe * speed * sin);
 			
 			double mx = Math.abs(xAng * 100) + 1;
 			double mz = Math.abs(zAng * 100) + 1;
 			
-			for (int i = (int) mx; i > 0; i--) {
-			
-				Entity e = lvl.getEntity((int) (tX + xAng * i / mx), tY);
-				
-				if (e != null) {
-					
-					if (!e.collides(player)) {
-						
-						cam.changePostion(xAng * i / mx, 0, 0);
-						break;
-						
-					} else {
-						
-						xAng = 0;
-						
-					}
-					
-				} else {
-					
-					cam.changePostion(xAng * i / mx, 0, 0);
-					break;
-					
-				}
-			
-			}
-			
-			for (int i = (int) mz; i > 0; i--) {
-			
-				Entity e = lvl.getEntity(tX, (int) (tY + zAng * i / mz));
-				
-				if (e != null) {
-					
-					//Logger.log(e.collides(player));
-					
-					if (!e.collides(player)) {
-						
-						cam.changePostion(0, 0, zAng * i / mz);
-						break;
-						
-					} else {
-						
-						zAng = 0;
-						
-					}
-					
-				} else {
-					
-					cam.changePostion(0, 0, zAng * i / mz);
-					break;
-					
-				}
-				
-			}
+			cam.changePostion(xAng, 0, zAng);
 			
 			block.onBlock(player);
 			
@@ -172,7 +122,7 @@ public class GameState extends Screen {
 			
 		}
 		
-		cam.setPostion(MathUtil.clamp(cam.position.x, -15, (lvl.getWidth() * 16) - 32), cam.position.y, MathUtil.clamp(cam.position.z, -15, (lvl.getHeight() * 16) - 32));
+		cam.setPostion(MathUtil.clamp(cam.position.x, -23, (lvl.getWidth() * 16) - 28), cam.position.y, MathUtil.clamp(cam.position.z, -23, (lvl.getHeight() * 16) - 28));
 		
 		lastBlock = block;
 		
@@ -260,6 +210,9 @@ public class GameState extends Screen {
 		forward = (keyboard.up.pressed && !keyboard.down.pressed? 1.0f : (keyboard.down.pressed && !keyboard.up.pressed? -1.0f : 0.0f));
 		strafe = (keyboard.right.pressed && !keyboard.left.pressed? 1.0f : (keyboard.left.pressed && !keyboard.right.pressed? -1.0f : 0.0f));
 		
+		if (renderer instanceof Render2D)
+			strafe *= -1;
+		
 	}
 	
 	public void useEntity() {
@@ -270,8 +223,10 @@ public class GameState extends Screen {
 		
 		Entity e;
 		
-		if (lvl.getEntity(tX, tY) != null)
+		if (lvl.getEntity(tX, tY) != null) {
 			e = lvl.getEntity(tX, tY);
+			e.inEntity(player);
+		}
 		
 		else
 			e = lvl.getEntity(tX + x, tY + y);
@@ -293,7 +248,7 @@ public class GameState extends Screen {
 
 		this.fill(0);
 		
-		render3D.render(this, cam, lvl);
+		renderer.render(this, cam, lvl);
 		
 		SystemFont.draw("X: " + tX + ", Y: " + tY, this, 0, 0, 2);
 		SystemFont.draw("FPS: " + Game.fps, this, 0, 14, 2);
@@ -328,6 +283,9 @@ public class GameState extends Screen {
 		
 		if (player.selectedItem != null)
 			this.scaledDraw(player.selectedItem.getTexture(Item.STATIC_TEXTURE + (itemUseLength > 0? 1 : 0)).createRenderFromSprite(), width - 16*(17 + (itemUseLength > 0? 2 : 0)), height - (int)(16*21) + 42, 16);
+		
+		SystemFont.draw("Speed: " + (player.speed + 1), this, 1, height - (17 * 8), 2);
+		SystemFont.draw("Defense: " + player.defense, this, 1, height - (17 * 7), 2);
 		
 	}
 

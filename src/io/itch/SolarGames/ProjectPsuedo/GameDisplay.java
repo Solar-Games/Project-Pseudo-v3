@@ -9,6 +9,7 @@ import me.sjplus.SJEngine.Game;
 import me.sjplus.SJEngine.Game.LibraryIntro;
 import me.sjplus.SJEngine.ScreenHandler;
 import me.sjplus.SJEngine.renderer.*;
+import me.sjplus.SJEngine.sound.Sound;
 import me.sjplus.SJEngine.util.Logger;
 
 public class GameDisplay {
@@ -25,6 +26,13 @@ public class GameDisplay {
 	public static SpriteSheet entities = new SpriteSheet("entities.png");
 	public static SpriteSheet items = new SpriteSheet("items.png");
 	public static SpriteSheet uicmpnts = new SpriteSheet("uicomp.png");
+	public static SpriteSheet walls = new SpriteSheet("walls.png");
+	
+	public static final Sound rockSound = new Sound("rock.wav");
+	public static final Sound woodSound = new Sound("wood.wav");
+
+	public static SpriteSheet skin;
+	
 	public static final FontRenderer smooth_font = new FontRenderer(new SpriteSheet("smooth-font.png"), 64, 64, -28, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$,.?");
 	public static Sprite[] test = new Sprite[8];
 	
@@ -38,10 +46,13 @@ public class GameDisplay {
 		Config.setUpGame();
 		
 		if (Settings.debug_test_texture_path != null)
-			for (int i = 0; i < 8; i++)
+			for (int i = 0; i < 3; i++)
 				if (Settings.debug_test_texture_path.length > 0)
 					if (GameDisplay.class.getResource("/" + Settings.debug_test_texture_path[0] + (i+1) + ".png") != null)
 						test[i] = new Sprite(Settings.debug_test_texture_path[0] + (i+1) + ".png");
+		
+		if (GameDisplay.class.getResource("/" + Settings.debug_test_texture_path[0] + 4 + ".png") != null)
+			skin = new SpriteSheet(Settings.debug_test_texture_path[0] + "4.png");
 		
 		Display d = new Display("Project Pseudo", width, height);
 		d.setClientRates(60, 144);

@@ -22,6 +22,7 @@ public class Player extends Entity {
 	public Boots boots;
 	public Chestplate chestplate;
 	public Helmet helmet;
+	public double speed;
 	public Item selectedItem;
 	public int hotbar = 0;
 	
@@ -34,6 +35,10 @@ public class Player extends Entity {
 		this.camera = camera;
 		this.items = new Item[27];
 		items[0] = Item.hand;
+		
+		addArmor(Armor.dragon_boots);
+		addArmor(Armor.dragon_chestplate);
+		addArmor(Armor.dragon_helmet);
 		
 		timer = new Timer();
 		
@@ -55,6 +60,21 @@ public class Player extends Entity {
 		selectedItem = items[hotbar];
 		
 		mouse.wheelIncrement = 0;
+		
+		float bd = (boots != null? boots.getDefense() : 0);
+		float cd = (chestplate != null? chestplate.getDefense() : 0);
+		float hd = (helmet != null? helmet.getDefense() : 0);
+		
+		defense = bd + cd + hd;
+		
+		updateItem();
+		
+	}
+	
+	public void updateItem() {
+		
+		if (boots == Armor.dragon_boots)
+			speed = 0.75;
 		
 	}
 	

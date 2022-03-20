@@ -48,7 +48,7 @@ public class Generation {
 					
 					genData[x+y*width] = 0x00ff00;
 					
-					if (gen > 50)
+					if (gen > 35)
 						genData[x+y*width] = 0x5D9F00;
 					
 					if (gen > 90)
@@ -87,10 +87,13 @@ public class Generation {
 					
 					genData[x+y*width] = 0x909090;
 					
-					if (gen > 75)
+					if (gen > 65)
 						genData[x+y*width] = 0x353535;
 					
-					if (gen > 115)
+					if (gen > 84)
+						genData[x+y*width] = 0x878787;
+					
+					if (gen > 105)
 						genData[x+y*width] = 0x555555;
 					
 					if (overworld.getBlock(x, y) instanceof TunnelBlock)
@@ -109,6 +112,23 @@ public class Generation {
 		}
 
 		Level.createLevel(id, genData, width, height, true, 0x909090);
+		
+	}
+	
+	public static void createTestLevel(int id) {
+		
+		int[] genData = new int[128*128];
+		
+		for (int i = 0; i < genData.length; i++) {
+			
+			genData[i] = 0x00ff00;
+			
+			if (i % 128 == 63 && i / 128 == 63)
+				genData[i] = 0x00B200;
+			
+		}
+		
+		Level.createLevel(id, genData, 128, 128, false, 0xffffff);
 		
 	}
 	

@@ -8,15 +8,18 @@ import me.sjplus.SJEngine.renderer.Sprite;
 public class Armor {
 	
 	public static final Boots iron_boots = new Boots("Iron Boots", 0xD6B0A2, 0, 3.5f);
+	public static final Boots dragon_boots = new Boots("Dragon Boots", 0x52008C, 1, 7.5f);
 	
-	public static final Chestplate iron_chestplate = new Chestplate("Iron Chestplate", 0xD6B0A2, 0, 6);
+	public static final Chestplate iron_chestplate = new Chestplate("Iron Chestplate", 0xD6B0A2, 0, 4.75f);
+	public static final Chestplate dragon_chestplate = new Chestplate("Dragon Chestplate", 0x52008C, 1, 10.5f);
 	
 	public static final Helmet iron_helmet = new Helmet("Iron Helmet", 0xD6B0A2, 0, 3.5f);
+	public static final Helmet dragon_helmet = new Helmet("Dragon Helmet", 0x52008C, 1, 6.25f);
 	
 	private final float defense;
-	public Sprite texture;
-	public int id;
-	public String name;
+	private Sprite texture;
+	public final int id;
+	public final String name;
 	
 	public Armor(String name, int col, int id, float defense) {
 	

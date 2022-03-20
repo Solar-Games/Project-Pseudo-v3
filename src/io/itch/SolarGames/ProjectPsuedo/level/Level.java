@@ -48,7 +48,7 @@ public class Level {
 		for (int i = 0; i < w * h; i++) {
 			
 			blocks[i] = createBlock(i % w, i / h, data[i]);
-			createEntity(i % w, i / h, data[i]);
+			createEntity((i % w), (i / h), data[i]);
 			
 		}
 		
@@ -122,11 +122,12 @@ public class Level {
 		if (col == 0x5D9F00) return new GrassBlock();
 		if (col == 0xBFF0BF) return new GrassBlock();
 		if (col == 0x00B200) return new TunnelBlock(false);
-		if (col == 0x353535) return new StoneBlock();
+		if (col == 0x353535) return new StoneBlock(false);
 		if (col == 0x101010) return new TunnelBlock(true);
 		if (col == 0x0045ef) return new WaterBlock();
-		if (col == 0x909090) return new StoneBlock();
-		if (col == 0x555555) return new StoneBlock();
+		if (col == 0x909090) return new StoneBlock(false);
+		if (col == 0x878787) return new StoneBlock(true);
+		if (col == 0x555555) return new StoneBlock(false);
 		if (col == 0x385089) return new UGWaterBlock();
 		
 		return new Block();

@@ -34,6 +34,20 @@ public class Block {
 		
 	}
 	
+	public Sprite getWallTexture() {
+		
+		if (floorTexture == null) {
+		
+			wallTexture = GameDisplay.walls.copySpriteFromSheet((wallTex % 8) + 1, (wallTex / 8) + 1, 16, 24, 16, 24);
+			
+			wallTexture = Art.shiftColorsInSprite(wallTexture, color);
+			
+		}
+			
+		return wallTexture;
+		
+	}
+	
 	public Sprite getCeilTexture() {
 		
 		if (ceilTexture == null) {

@@ -1,8 +1,10 @@
 package io.itch.SolarGames.ProjectPsuedo.entities;
 
+import io.itch.SolarGames.ProjectPsuedo.GameDisplay;
 import io.itch.SolarGames.ProjectPsuedo.inv.Item;
 import io.itch.SolarGames.ProjectPsuedo.level.Level;
 import me.sjplus.SJEngine.math.Vector3;
+import me.sjplus.SJEngine.sound.Sound;
 
 public class EntityStoneRock extends EntityRock {
 
@@ -21,6 +23,9 @@ public class EntityStoneRock extends EntityRock {
 		if (item.equals(Item.stone_pick)) damage = 2;
 		
 		stage += damage;
+		
+		if (e instanceof Player && damage > 0)
+			GameDisplay.rockSound.play();
 		
 		if (stage >= health) {
 			

@@ -57,5 +57,9 @@ public abstract class Entity {
 				e.pos.z - e.radius < pos.z + radius;
 		
 	}
+	
+	public void inEntity(Entity e) {
+		
+	}
 
 }

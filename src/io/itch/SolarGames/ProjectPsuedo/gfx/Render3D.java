@@ -10,7 +10,7 @@ import me.sjplus.SJEngine.math.*;
 import me.sjplus.SJEngine.renderer.*;
 import me.sjplus.SJEngine.util.*;
 
-public class Render3D extends Render {
+public class Render3D extends GameRenderer {
 
 	public double[] zBuffer;
 	public double[] zWallBuffer;
@@ -36,14 +36,30 @@ public class Render3D extends Render {
 		screen.pixels = pixels;
 		
 		renderFloor(camera, level);
+		
+		for (int i = 0; i < level.blocks.length; i++) {
 
+			Block block = level.getBlock(i % level.getWidth(), i / level.getWidth());
+			
+			if (block == null)
+				continue;
+				
+			if (!block.isWall())
+				continue;
+			
+			renderWall((i % level.getWidth()), (i / level.getWidth()) + 1, camera, block);
+				
+		}
+		
 		for (Entity e : level.entities)
 			renderSprite(level, camera, e);
 		
-		renderWall(0, -25, 25, -7,camera, GameDisplay.test[0]);
-		
 		if (!Settings.choppyFading)
-			postProcess(camera);
+			fpostProcess(camera);
+		else
+			cpostProcess(camera);
+		
+		Settings.setChoppyFading(false);
 		
 		if (level.brightness != brightness)
 			brightness = level.brightness;
@@ -88,7 +104,7 @@ public class Render3D extends Render {
 				int w = level.getWidth();
 				int h = level.getHeight();
 				
-				if (tileX >= w || tileY >= h || tileX < 0 || tileY < 0 || (!level.hasACeiling() && !floor) || zD > 696.5 / 4)
+				if (tileX >= w || tileY >= h || tileX < 0 || tileY < 0 || (!level.hasACeiling() && !floor) || xx < 0 || yy < 0)
 					continue;
 				
 				Block block = level.getBlock(tileX, tileY);
@@ -96,12 +112,12 @@ public class Render3D extends Render {
 				if (floor) {
 				
 					zBuffer[x + y * width] = zD;
-					pixels[x + y * width] = Art.shiftColorInInt(block.getFloorTexture().pixels[(xPix & 15) + (yPix & 15) * block.getFloorTexture().width], (int) (brightness));
+					pixels[x + y * width] = block.getFloorTexture().pixels[(xPix & 15) + (yPix & 15) * block.getFloorTexture().width];
 				
 				} else {
 					
 					zBuffer[x + y * width] = zD;
-					pixels[x + y * width] = Art.shiftColorInInt(block.getCeilTexture().pixels[(xPix & 15) + (yPix & 15) * block.getCeilTexture().width], (int) (brightness));
+					pixels[x + y * width] = block.getCeilTexture().pixels[(xPix & 15) + (yPix & 15) * block.getCeilTexture().width];
 					
 				}
 				
@@ -147,7 +163,7 @@ public class Render3D extends Render {
 		xp1 = Math.min(xp1, width);
 		yp1 = Math.min(yp1, height);
 		
-		zz *= 4;
+		zz *= 8;
 		
 		for (int yp = yp0; yp < yp1; yp++) {
 			
@@ -161,10 +177,10 @@ public class Render3D extends Render {
 				
 				if (zBuffer[xp + yp * width] > zz) {
 					
-					if (texture.alpha[xt + yt * texture.width] != 1 || zz / 4 > (696.5) / 32)
+					if (texture.alpha[xt + yt * texture.width] != 1)
 						continue;
 					
-					pixels[xp + yp * width] = Art.shiftColorInInt(texture.pixels[xt + yt * texture.width], (int) (brightness));
+					pixels[xp + yp * width] = texture.pixels[xt + yt * texture.width];
 					zBuffer[xp + yp * width] = zz;
 					
 				}
@@ -181,27 +197,27 @@ public class Render3D extends Render {
 		
 	}
 	
-	public void renderWall(double x0, double z0, double x1, double z1, Camera cam, Sprite sprite) {
+	public void renderWall(double x0, double z0, double x1, double z1, double y0, double y1, double y2, double y3, Camera cam, Sprite sprite) {
 		
 		double cos = Math.cos(Math.toRadians(cam.rotation.x)),
 				sin = Math.sin(Math.toRadians(cam.rotation.x));
 		
 		double pitchSin = Math.sin(Math.toRadians(cam.rotation.y));
 		
-		double xc0 = ((x0) + cam.position.x) / 8 + sin * 0.016;
-		double zc0 = ((z0) - cam.position.z) / 8 - cos * 0.016;
+		double xc0 = ((x0) + cam.position.x) / 8;
+		double zc0 = ((z0) - cam.position.z) / 8;
 		
 		double xx0 = xc0 * cos + zc0 * sin;
-		double u0 = ((-0.5 * 33) + cam.position.y) / 8;
-		double l0 = ((+0.5 * 32) + cam.position.y) / 8;
+		double u0 = ((y0) + cam.position.y) / 8;
+		double l0 = ((y1) + cam.position.y) / 8;
 		double zz0 = zc0 * cos - xc0 * sin;
 		
-		double xc1 = ((x1) + cam.position.x) / 8 + sin * 0.016;
-		double zc1 = ((z1) - cam.position.z) / 8 - cos * 0.016;
+		double xc1 = ((x1) + cam.position.x) / 8;
+		double zc1 = ((z1) - cam.position.z) / 8;
 		
 		double xx1 = xc1 * cos + zc1 * sin;
-		double u1 = ((-0.5 * 24) + cam.position.y) / 8;
-		double l1 = ((+0.5 * 24) + cam.position.y) / 8;
+		double u1 = ((y2) + cam.position.y) / 8;
+		double l1 = ((y3) + cam.position.y) / 8;
 		double zz1 = zc1 * cos - xc1 * sin;
 		
 		double zClip = 0.2;
@@ -251,15 +267,13 @@ public class Render3D extends Render {
 		double iw = 1 / (xPixel1 - xPixel0);
 		
 		double ixt0 = 0 * iz0;
-		double ixta = (sprite.width * iz1) - ixt0;
+		double ixta = sprite.width * iz1 - ixt0;
 		
 		for (int x = xp0; x < xp1; x++) {
 			
 			double pr = (x - xPixel0) * iw;
 			double iz = iz0 + iza * pr;
 			
-			if (zWallBuffer[x] > iz && iz < (696.5) / 4) return;
-			zWallBuffer[x] = iz;
 			int xTex = (int) ((ixt0 + ixta * pr) / iz);
 			
 			double yPixel0 = lerp(yPixel00, yPixel10, pr);
@@ -279,10 +293,10 @@ public class Render3D extends Render {
 				
 				int yTex = (int) (sprite.height * pry);
 				
-				if (sprite.alpha[xTex + yTex * sprite.width] != 0)
-					pixels[x+y*width] = sprite.pixels[xTex + yTex * sprite.width];
+				if (sprite.alpha[xTex + yTex * sprite.width] != 1 || zBuffer[x + y * width] < 1 / iz * 8) continue;
 				
-				zBuffer[x+y*width] = 1 / iz * 4;
+				pixels[x + y * width] = sprite.pixels[xTex + yTex * sprite.width];
+				zBuffer[x+y*width] = 1 / iz * 8;
 				
 			}
 			
@@ -290,26 +304,124 @@ public class Render3D extends Render {
 		
 	}
 	
-	public void postProcess(Camera cam) {
+	public void renderWall(double x0, double z0, double x1, double z1, double y0, double y1, Camera cam, Sprite sprite) {
+		
+		renderWall(x0, z0, x1, z1, y0, y1, y0, y1, cam, sprite);
+		
+	}
+	
+	public void renderWall(double x0, double z0, double x1, double z1, Camera cam, Sprite sprite) {
+		
+		renderWall(x0, z0, x1, z1, -12, +12, cam, sprite);
+		
+	}
+	
+	public void renderWall(double x, double z, Camera camera, Sprite sprite) {
+		
+		if (sprite != null) {
+		
+			renderWall(8 - (x * 16),
+					16 + (z * 16) - 24,
+					(16 + 8) - (x * 16),
+					16 + (z * 16) - 24,
+					camera, sprite);
+			
+			renderWall((16 + 8) - (x * 16) + 32,
+					-16 + (z * 16) - 8,
+					(16 + 8) - (x * 16) + 32,
+					-16 + (z * 16) - 24,
+					camera, sprite);
+			
+			renderWall((-8 - (x * 16)) + 32,
+					16 + (z * 16) - 8,
+					(-(16 + 8) - (x * 16)) + 32,
+					16 + (z * 16) - 8,
+					camera, sprite);
+			
+			renderWall((-(16 + 8) - (x * 16)),
+					-16 + (z * 16) - 24,
+					(-(16 + 8) - (x * 16)),
+					-16 + (z * 16) - 8,
+					camera, sprite);
+		
+		}
+		
+	}
+	
+	public void renderWall(double x, double z, Camera camera, Block block) {
+		
+		if (block.getWallTexture() != null) {
+		
+			renderWall(8 - (x * 16),
+					-16 + (z * 16) - 8,
+					(16 + 8) - (x * 16),
+					-16 + (z * 16) - 8,
+					camera, block.getWallTexture());
+			
+			renderWall((16 + 8) - (x * 16),
+					-16 + (z * 16) - 8,
+					(16 + 8) - (x * 16),
+					-16 + (z * 16) - 24,
+					camera, block.getWallTexture());
+			
+			renderWall((-8 - (x * 16)) + 32,
+					-16 + (z * 16) - 24,
+					(-(16 + 8) - (x * 16)) + 32,
+					-16 + (z * 16) - 24,
+					camera, block.getWallTexture());
+			
+			renderWall((-(16 + 8) - (x * 16)) + 32,
+					-16 + (z * 16) - 24,
+					(-(16 + 8) - (x * 16)) + 32,
+					-16 + (z * 16) - 8,
+					camera, block.getWallTexture());
+		
+		}
+		
+	}
+	
+	public void renderPlane(double x0, double z0, double x1, double z1, double y, Camera cam, Sprite sprite) {
+		
+		
+		
+	}
+	
+	public void fpostProcess(Camera cam) {
 		
 		for (int i = 0; i < zBuffer.length; i++) {
 			
-			double xx = (i % width - width / 2.0) / width;
-			double yy = (i / height - height / 2.0 + Math.sin(Math.toRadians(cam.rotation.y - 30)) * 360);
+			if (zBuffer[i] > (696.4 / 4) * ((int) brightness & 0xff)/255) {
 			
-			int yFade = (int) MathUtil.clamp(0 + yy + xx, 0, 255);
+				int yFade = 255 - (int) Math.min(MathUtil.clamp(zBuffer[i] - (696.4 / 4) * ((int) brightness & 0xff)/255, 0, 32) * 8, 255);
+				
+				int pixel = pixels[i];
+				
+				int r = (pixel >> 16) & 0xff;
+				int g = (pixel >> 8) & 0xff;
+				int b = (pixel) & 0xff;
+				
+				r = r * yFade / 255;
+				g = g * yFade / 255;
+				b = b * yFade / 255;
+				
+				pixels[i] = r << 16 | g << 8 | b;
+		
+			}
 			
-			int pixel = pixels[i];
+			pixels[i] = Art.shiftColorInInt(pixels[i], (int) brightness);
 			
-			int r = (pixel >> 16) & 0xff;
-			int g = (pixel >> 8) & 0xff;
-			int b = (pixel) & 0xff;
+		}
+		
+	}
+	
+	public void cpostProcess(Camera cam) {
+		
+		for (int i = 0; i < zBuffer.length; i++) {
 			
-			r = r * yFade / 255;
-			g = g * yFade / 255;
-			b = b * yFade / 255;
+			if (zBuffer[i] > (696.4 / 4) * ((int) brightness & 0xff)/255)
+				pixels[i] = 0;
 			
-			pixels[i] = r << 16 | g << 8 | b;
+			pixels[i] = Art.shiftColorInInt(pixels[i], (int) brightness);
 			
 		}
 		

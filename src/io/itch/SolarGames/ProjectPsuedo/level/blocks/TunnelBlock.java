@@ -15,7 +15,7 @@ public class TunnelBlock extends Block {
 			
 		} else {
 		
-			this.floorTex = 3;
+			this.floorTex = 5;
 			this.ceilTex = 4;
 
 		}

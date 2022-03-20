@@ -27,6 +27,9 @@ public class EntityTree extends Entity {
 		
 		stage += damage;
 		
+		if (e instanceof Player && damage > 0)
+			GameDisplay.woodSound.play();
+		
 		if (stage >= 20) {
 			
 			level.removeEntity(this);

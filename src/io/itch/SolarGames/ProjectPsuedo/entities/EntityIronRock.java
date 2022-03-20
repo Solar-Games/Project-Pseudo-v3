@@ -1,5 +1,6 @@
 package io.itch.SolarGames.ProjectPsuedo.entities;
 
+import io.itch.SolarGames.ProjectPsuedo.GameDisplay;
 import io.itch.SolarGames.ProjectPsuedo.inv.Item;
 import io.itch.SolarGames.ProjectPsuedo.level.Level;
 import me.sjplus.SJEngine.math.Vector3;
@@ -19,12 +20,15 @@ public class EntityIronRock extends EntityRock {
 		
 		stage += damage;
 		
+		if (e instanceof Player && damage > 0)
+			GameDisplay.rockSound.play();
+		
 		if (stage >= health) {
 			
 			level.removeEntity(this);
 			
 			if (e instanceof Player) {
-			
+				
 				Player player = ((Player) e);
 				
 				player.giveItem(this.item, 5);

@@ -121,7 +121,7 @@ public class InventoryState extends Screen {
 		if (Settings.inv_bg != null)
 			this.draw(Settings.inv_bg.createRenderFromSprite(), (width - 1080)/2, (height - 720)/2);
 		else
-			GameState.render3D.render(this, GameState.cam, GameDisplay.level);
+			GameState.renderer.render(this, GameState.cam, GameDisplay.level);
 		
 		this.multiplyPixelColors(256/3, 256/3, 256/3);
 
