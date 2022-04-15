@@ -9,4 +9,16 @@ public class GrassBlock extends Block {
 		
 	}
 	
+	public double getWalkSpeed() {
+		
+		return 1/3.334f;
+		
+	}
+	
+	public double getFriction() {
+
+		return 0.628;
+		
+	}
+	
 }

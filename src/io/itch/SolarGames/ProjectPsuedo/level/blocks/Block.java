@@ -4,6 +4,7 @@ import io.itch.SolarGames.ProjectPsuedo.GameDisplay;
 import io.itch.SolarGames.ProjectPsuedo.entities.Entity;
 import io.itch.SolarGames.ProjectPsuedo.gfx.Art;
 import me.sjplus.SJEngine.renderer.*;
+import me.sjplus.SJEngine.util.*;
 
 public class Block {
 	
@@ -16,49 +17,74 @@ public class Block {
 	
 	protected boolean blocksEntities;
 	
-	protected Sprite floorTexture;
-	protected Sprite wallTexture;
-	protected Sprite ceilTexture;
+	protected Timer timer = new Timer();
+	
+	protected int frame = 0;
+	protected float speed = 0;
+	protected boolean animated = false;
+	
+	protected Sprite[] floorTexture;
+	protected Sprite[] wallTexture;
+	protected Sprite[] ceilTexture;
+	
+	public Block(int frames, float speed, boolean animated) {
+		
+		floorTexture = new Sprite[frames];
+		wallTexture = new Sprite[frames];
+		ceilTexture = new Sprite[frames];
+		this.speed = speed;
+		this.animated = animated;
+		
+	}
+	
+	public Block() {
+		
+		floorTexture = new Sprite[1];
+		wallTexture = new Sprite[1];
+		ceilTexture = new Sprite[1];
+		this.animated = false;
+		
+	}
 	
 	public Sprite getFloorTexture() {
 		
-		if (floorTexture == null) {
-		
-			floorTexture = GameDisplay.tiles.copySpriteFromSheet((floorTex % 8) + 1, (floorTex / 8) + 1, 16, 16, 16);
+		if (floorTexture[frame] == null) {
 			
-			floorTexture = Art.shiftColorsInSprite(floorTexture, color);
+			floorTexture[frame] = GameDisplay.tiles.copySpriteFromSheet(((floorTex + frame) % 8) + 1, ((floorTex + frame) / 8) + 1, 16, 16, 16);
+			
+			floorTexture[frame] = Art.shiftColorsInSprite(floorTexture[frame], color);
 			
 		}
 			
-		return floorTexture;
+		return floorTexture[frame];
 		
 	}
 	
 	public Sprite getWallTexture() {
 		
-		if (floorTexture == null) {
+		if (wallTexture[frame] == null) {
 		
-			wallTexture = GameDisplay.walls.copySpriteFromSheet((wallTex % 8) + 1, (wallTex / 8) + 1, 16, 24, 16, 24);
+			wallTexture[frame] = GameDisplay.walls.copySpriteFromSheet(((wallTex + frame) % 8) + 1, ((wallTex + frame) / 8) + 1, 16, 24, 16, 24);
 			
-			wallTexture = Art.shiftColorsInSprite(wallTexture, color);
+			wallTexture[frame] = Art.shiftColorsInSprite(wallTexture[frame], color);
 			
 		}
 			
-		return wallTexture;
+		return wallTexture[frame];
 		
 	}
 	
 	public Sprite getCeilTexture() {
 		
-		if (ceilTexture == null) {
+		if (ceilTexture[frame] == null) {
 		
-			ceilTexture = GameDisplay.tiles.copySpriteFromSheet((ceilTex % 8) + 1, (ceilTex / 8) + 1, 16, 16, 16);
+			ceilTexture[frame] = GameDisplay.tiles.copySpriteFromSheet(((ceilTex + frame) % 8) + 1, ((ceilTex + frame) / 8) + 1, 16, 16, 16);
 			
-			ceilTexture = Art.shiftColorsInSprite(ceilTexture, color);
+			ceilTexture[frame] = Art.shiftColorsInSprite(ceilTexture[frame], color);
 			
 		}
 			
-		return ceilTexture;
+		return ceilTexture[frame];
 		
 	}
 
@@ -73,10 +99,16 @@ public class Block {
 		return 0;
 	
 	}
-
+	
 	public double getWalkSpeed() {
 		
-		return 1;
+		return 1/3.334f;
+		
+	}
+	
+	public double getFriction() {
+
+		return 0.628;
 		
 	}
 	
@@ -87,6 +119,17 @@ public class Block {
 	}
 	
 	public void onBlock(Entity e) {
+		
+	}
+	
+	public void update() {
+		
+		if (timer.hasTimeElapsed((long) (speed * 1000), true) && animated) {
+			
+			frame += 1;
+			frame %= floorTexture.length;
+			
+		}
 		
 	}
 	

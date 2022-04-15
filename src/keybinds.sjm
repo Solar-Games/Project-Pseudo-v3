@@ -1,0 +1,5 @@
+forward=[0,87]
+left_strafe=[1,65]
+backwards=[2,83]
+right_strafe=[3,68]
+inventory=[4,69]

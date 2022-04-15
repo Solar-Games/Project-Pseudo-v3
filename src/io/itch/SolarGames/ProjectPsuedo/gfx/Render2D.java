@@ -4,6 +4,7 @@ import io.itch.SolarGames.ProjectPsuedo.entities.Entity;
 import io.itch.SolarGames.ProjectPsuedo.inv.Item;
 import io.itch.SolarGames.ProjectPsuedo.level.Level;
 import io.itch.SolarGames.ProjectPsuedo.level.blocks.Block;
+import me.sjplus.SJEngine.math.Vector3;
 import me.sjplus.SJEngine.renderer.Render;
 import me.sjplus.SJEngine.renderer.Screen;
 import me.sjplus.SJEngine.renderer.Sprite;
@@ -28,17 +29,19 @@ public class Render2D extends GameRenderer {
 	
 	public void renderFloor(Level level, Camera camera) {
 		
-		double cos = Math.cos(Math.toRadians(camera.rotation.x - 180)),
-				sin = Math.sin(Math.toRadians(camera.rotation.x - 180));
+		Vector3 pos = camera.getPos();
 		
-		int playerPosX = (int) (24 + camera.position.x) >> 4;
-		int playerPosZ = (int) (24 + camera.position.z) >> 4;
+		double cos = Math.cos(Math.toRadians(camera.getRot().x - 180)),
+				sin = Math.sin(Math.toRadians(camera.getRot().x - 180));
+		
+		int playerPosX = (int) (24 + pos.x) >> 4;
+		int playerPosZ = (int) (24 + pos.z) >> 4;
 		
 		for (int y = 0; y < height; y++) {
 			
 			double yD = (y - height / 2.0) / 4;
 			
-			double zD = Math.max(2 + camera.position.y/4 + (yD - 150) / camera.fov, 2) / 4;
+			double zD = Math.max(2 + pos.y/4 + (yD - 150) / camera.fov, 2) / 4;
 			zD /= (yD + y)/2000;
 			
 			yD *= zD;
@@ -48,8 +51,8 @@ public class Render2D extends GameRenderer {
 				double xD = (x - width / 2.0) / 4;
 				xD *= zD;
 				
-				double xx = xD * cos + yD * sin + (24 + camera.position.x);
-				double yy = yD * cos - xD * sin + (24 + camera.position.z);
+				double xx = xD * cos + yD * sin + (24 + pos.x);
+				double yy = yD * cos - xD * sin + (24 + pos.z);
 				
 				int cX = (int) xx;
 				int cY = (int) yy;

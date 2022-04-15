@@ -35,15 +35,15 @@ public class InventoryState extends Screen {
 		player = GameDisplay.player;
 		this.gs = gs;
 		
-		itemHB = new HoverBox[27];
+		itemHB = new HoverBox[24];
 		armorHB = new HoverBox[3];
 		
 		int xOff = (width - (64 * 12))/2;
 		int yOff = (int) ((height/2 - (1 * height/2)) + (height - (64 * -3))/2);
 		
-		for (int i = 0; i < 27; i++) {
+		for (int i = 0; i < 24; i++) {
 			
-			itemHB[i] = new HoverBox(new Vector2(xOff + (i % 9) * 64, yOff + (i / 9) * 64), 64, 64);
+			itemHB[i] = new HoverBox(new Vector2(xOff + (i % 8) * 64, yOff + (i / 8) * 64), 64, 64);
 			
 		}
 		
@@ -121,7 +121,7 @@ public class InventoryState extends Screen {
 		if (Settings.inv_bg != null)
 			this.draw(Settings.inv_bg.createRenderFromSprite(), (width - 1080)/2, (height - 720)/2);
 		else
-			GameState.renderer.render(this, GameState.cam, GameDisplay.level);
+			GameState.renderer.render(this, gs.player, GameDisplay.level);
 		
 		this.multiplyPixelColors(256/3, 256/3, 256/3);
 
@@ -177,7 +177,7 @@ public class InventoryState extends Screen {
 		
 			for (int i = 0; i < player.items.length; i++) {
 				
-				this.scaledDraw(hotbatComp[p*2+(itemHB[i].isHovered() && fin? 1 : 0)].createRenderFromSprite(), xOff + (i % 9) * 64, yOff + (i / 9) * 64, 4);
+				this.scaledDraw(hotbatComp[p*2+(itemHB[i].isHovered() && fin? 1 : 0)].createRenderFromSprite(), xOff + (i % 8) * 64, yOff + (i / 8) * 64, 4);
 				
 			}
 		

@@ -27,61 +27,65 @@ public class Render3D extends GameRenderer {
 	
 	public void render(Screen screen, Camera camera, Level level) {
 
-		for (int i = 0; i < zWallBuffer.length; i++)
-			zWallBuffer[i] = 0;
+		if (level != null) {
 		
-		for (int i = 0; i < zBuffer.length; i++)
-			zBuffer[i] = 10000;
-		
-		screen.pixels = pixels;
-		
-		renderFloor(camera, level);
-		
-		for (int i = 0; i < level.blocks.length; i++) {
-
-			Block block = level.getBlock(i % level.getWidth(), i / level.getWidth());
+			for (int i = 0; i < zBuffer.length; i++)
+				zBuffer[i] = 10000;
 			
-			if (block == null)
-				continue;
-				
-			if (!block.isWall())
-				continue;
+			screen.pixels = pixels;
 			
-			renderWall((i % level.getWidth()), (i / level.getWidth()) + 1, camera, block);
+			renderFloor(camera, level);
+			
+			for (int i = 0; i < level.blocks.length; i++) {
+	
+				Block block = level.getBlock(i % level.getWidth(), i / level.getWidth());
 				
+				if (block == null)
+					continue;
+					
+				if (!block.isWall())
+					continue;
+				
+				renderWall((i % level.getWidth()), (i / level.getWidth()) + 1, camera, block);
+					
+			}
+			
+			for (Entity e : level.entities)
+				if (e.getTexture() != null)
+					renderSprite(level, camera, e);
+			
+			if (!Settings.choppyFading)
+				fpostProcess(camera);
+			else
+				cpostProcess(camera);
+			
+			Settings.setChoppyFading(false);
+			
+			if (level.brightness != brightness)
+				brightness = level.brightness;
+		
 		}
-		
-		for (Entity e : level.entities)
-			renderSprite(level, camera, e);
-		
-		if (!Settings.choppyFading)
-			fpostProcess(camera);
-		else
-			cpostProcess(camera);
-		
-		Settings.setChoppyFading(false);
-		
-		if (level.brightness != brightness)
-			brightness = level.brightness;
 		
 	}
 
 	public void renderFloor(Camera camera, Level level) {
 		
- 		double cos = Math.cos(Math.toRadians(camera.rotation.x));
-		double sin = Math.sin(Math.toRadians(camera.rotation.x));
+		Vector3 pos = camera.getPos();
+		
+ 		double cos = Math.cos(Math.toRadians(camera.getRot().x));
+		double sin = Math.sin(Math.toRadians(camera.getRot().x));
 		
 		for (int y = 0; y < height; y++) {
 			
-			double yD = (y - height / 2.0 + Math.sin(Math.toRadians(camera.rotation.y)) * 360) / camera.fov;
+			double yD = (y - height / 2.0 + Math.sin(Math.toRadians(camera.getRot().y)) * 360) / Settings.fov;
 			
 			boolean floor = true;
-			double zD = (12 + camera.position.y) / yD;
+			double zD = (12 + pos.y) / yD;
 			
 			if (yD < 0) {
 				
 				floor = false;
-				zD = (12 - camera.position.y) / -yD;
+				zD = (12 - pos.y) / -yD;
 				
 			}
 			
@@ -89,11 +93,11 @@ public class Render3D extends GameRenderer {
 
 				if (zBuffer[x + y * width] <= zD) continue;
 				
-				double xD = (x - width / 2.0) / camera.fov;
+				double xD = (x - width / 2.0) / Settings.fov;
 				xD *= zD;
 				
-				double xx = xD * cos + zD * sin + (24 + camera.position.x) * 1;
-				double yy = zD * cos - xD * sin + (24 + camera.position.z) * 1;
+				double xx = xD * cos + zD * sin + (24 + pos.x) * 1;
+				double yy = zD * cos - xD * sin + (24 + pos.z) * 1;
 				
 				int xPix = (int) (xx);
 				int yPix = (int) (yy);
@@ -112,12 +116,14 @@ public class Render3D extends GameRenderer {
 				if (floor) {
 				
 					zBuffer[x + y * width] = zD;
-					pixels[x + y * width] = block.getFloorTexture().pixels[(xPix & 15) + (yPix & 15) * block.getFloorTexture().width];
+					if (block.getFloorTexture() != null)
+						pixels[x + y * width] = block.getFloorTexture().pixels[(xPix & 15) + (yPix & 15) * block.getFloorTexture().width];
 				
 				} else {
 					
 					zBuffer[x + y * width] = zD;
-					pixels[x + y * width] = block.getCeilTexture().pixels[(xPix & 15) + (yPix & 15) * block.getCeilTexture().width];
+					if (block.getCeilTexture() != null)
+						pixels[x + y * width] = block.getCeilTexture().pixels[(xPix & 15) + (yPix & 15) * block.getCeilTexture().width];
 					
 				}
 				
@@ -129,14 +135,16 @@ public class Render3D extends GameRenderer {
 	
 	public void renderSprite(double x, double y, double z, Camera camera, Sprite texture) {
 		 
-		double cos = Math.cos(Math.toRadians(camera.rotation.x)),
-				sin = Math.sin(Math.toRadians(camera.rotation.x));
+		Vector3 pos = camera.getPos();
 		
-		double pitchSin = Math.sin(Math.toRadians(camera.rotation.y));
+		double cos = Math.cos(Math.toRadians(camera.getRot().x)),
+				sin = Math.sin(Math.toRadians(camera.getRot().x));
 		
-		double xc = (x + camera.position.x) / 8 + sin / 8;
-		double yc = (y + camera.position.y) / 8 + pitchSin * 1.25;
-		double zc = (z - camera.position.z) / 8 - cos / 8;
+		double pitchSin = Math.sin(Math.toRadians(camera.getRot().y));
+		
+		double xc = (x + pos.x) / 8 + sin / 8;
+		double yc = (y + pos.y) / 8 + pitchSin * 1.25;
+		double zc = (z - pos.z) / 8 - cos / 8;
 		
 		double xx = xc * cos + zc * sin;
 		double yy = yc - pitchSin;
@@ -144,8 +152,8 @@ public class Render3D extends GameRenderer {
 		
 		if (zz < 0.1) return;
 		
-		double xPixel = (width / 2.0) - (xx / zz * camera.fov);
-		double yPixel = (yy / zz * (camera.fov) + (height / 2.0 - pitchSin * 360));
+		double xPixel = (width / 2.0) - (xx / zz * Settings.fov);
+		double yPixel = (yy / zz * (Settings.fov) + (height / 2.0 - pitchSin * 360));
 		
 		double xPixel0 = xPixel - height / zz;
 		double xPixel1 = xPixel + height / zz;
@@ -199,25 +207,27 @@ public class Render3D extends GameRenderer {
 	
 	public void renderWall(double x0, double z0, double x1, double z1, double y0, double y1, double y2, double y3, Camera cam, Sprite sprite) {
 		
-		double cos = Math.cos(Math.toRadians(cam.rotation.x)),
-				sin = Math.sin(Math.toRadians(cam.rotation.x));
+		Vector3 pos = cam.getPos();
 		
-		double pitchSin = Math.sin(Math.toRadians(cam.rotation.y));
+		double cos = Math.cos(Math.toRadians(cam.getRot().x)),
+				sin = Math.sin(Math.toRadians(cam.getRot().x));
 		
-		double xc0 = ((x0) + cam.position.x) / 8;
-		double zc0 = ((z0) - cam.position.z) / 8;
+		double pitchSin = Math.sin(Math.toRadians(cam.getRot().y));
+		
+		double xc0 = ((x0) + pos.x) / 8;
+		double zc0 = ((z0) - pos.z) / 8;
 		
 		double xx0 = xc0 * cos + zc0 * sin;
-		double u0 = ((y0) + cam.position.y) / 8;
-		double l0 = ((y1) + cam.position.y) / 8;
+		double u0 = ((y0) + pos.y) / 8;
+		double l0 = ((y1) + pos.y) / 8;
 		double zz0 = zc0 * cos - xc0 * sin;
 		
-		double xc1 = ((x1) + cam.position.x) / 8;
-		double zc1 = ((z1) - cam.position.z) / 8;
+		double xc1 = ((x1) + pos.x) / 8;
+		double zc1 = ((z1) - pos.z) / 8;
 		
 		double xx1 = xc1 * cos + zc1 * sin;
-		double u1 = ((y2) + cam.position.y) / 8;
-		double l1 = ((y3) + cam.position.y) / 8;
+		double u1 = ((y2) + pos.y) / 8;
+		double l1 = ((y3) + pos.y) / 8;
 		double zz1 = zc1 * cos - xc1 * sin;
 		
 		double zClip = 0.2;
@@ -242,8 +252,8 @@ public class Render3D extends GameRenderer {
 			
 		}
 		
-		double xPixel0 = (width / 2.0) - (xx0 / zz0 * cam.fov);
-		double xPixel1 = (width / 2.0) - (xx1 / zz1 * cam.fov);
+		double xPixel0 = (width / 2.0) - (xx0 / zz0 * Settings.fov);
+		double xPixel1 = (width / 2.0) - (xx1 / zz1 * Settings.fov);
 		
 		if (xPixel0 >= xPixel1) return;
 		
@@ -255,10 +265,10 @@ public class Render3D extends GameRenderer {
 		
 		double yCent = height / 2.0 - pitchSin * 360;
 		
-		double yPixel00 = (u0 / zz0 * cam.fov + yCent);
-		double yPixel01 = (l0 / zz0 * cam.fov + yCent);
-		double yPixel10 = (u1 / zz1 * cam.fov + yCent);
-		double yPixel11 = (l1 / zz1 * cam.fov + yCent);
+		double yPixel00 = (u0 / zz0 * Settings.fov + yCent);
+		double yPixel01 = (l0 / zz0 * Settings.fov + yCent);
+		double yPixel10 = (u1 / zz1 * Settings.fov + yCent);
+		double yPixel11 = (l1 / zz1 * Settings.fov + yCent);
 		
 		double iz0 = 1 / zz0;
 		double iz1 = 1 / zz1;

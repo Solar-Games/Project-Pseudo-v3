@@ -13,6 +13,9 @@ public abstract class Entity {
 
 	private Sprite texture;
 	public Vector3 pos;
+	public FVector2 rot;
+	
+	public Vector3 vel;
 	
 	protected Level level;
 	
@@ -20,16 +23,23 @@ public abstract class Entity {
 	
 	public boolean unloaded = false;
 	
-	protected Entity(Vector3 pos, float radius, Level level, Sprite texture, int col) {
+	protected Entity(Vector3 pos, FVector2 rot, float radius, Level level, Sprite texture, int col) {
 		
 		this.pos = pos;
+		this.rot = rot;
+		this.vel = new Vector3(0, 0, 0);
 		this.level = level;
 		this.radius = radius;
-		this.texture = Art.shiftColorsInSprite(texture, col);
+		
+		if (texture != null)
+			this.texture = Art.shiftColorsInSprite(texture, col);
 		
 	}
 
-	public void update(Level level) {
+	public void update() {
+		
+		pos.add(vel);
+		pos.set(MathUtil.clamp(pos.x, -24, level.getWidth() * 32 - 8), pos.y, MathUtil.clamp(pos.z, -24, level.getHeight() * 32 - 8));
 		
 	}
 	
@@ -42,6 +52,17 @@ public abstract class Entity {
 	public Sprite getTexture() {
 		
 		return texture;
+		
+	}
+	
+	public void move(float forward, float strafe, double speed) {
+		
+		float yaw = rot.x;
+		
+		double cos = Math.cos(Math.toRadians(yaw)),
+				sin = Math.sin(Math.toRadians(yaw));
+		
+		vel.add(strafe * speed * cos + forward * speed * sin, 0, forward * speed * cos - strafe * speed * sin);
 		
 	}
 	

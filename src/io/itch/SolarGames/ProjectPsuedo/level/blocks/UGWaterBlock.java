@@ -8,7 +8,7 @@ public class UGWaterBlock extends WaterBlock {
 
 	public UGWaterBlock() {
 		
-		this.ceilTex = 3;
+		this.ceilTex = 5;
 		
 	}
 	
@@ -16,13 +16,13 @@ public class UGWaterBlock extends WaterBlock {
 		
 		if (ceilTexture == null) {
 		
-			ceilTexture = GameDisplay.tiles.copySpriteFromSheet((ceilTex % 8) + 1, (ceilTex / 8) + 1, 16, 16, 16);
+			ceilTexture[0] = GameDisplay.tiles.copySpriteFromSheet((ceilTex % 8) + 1, (ceilTex / 8) + 1, 16, 16, 16);
 			
-			ceilTexture = Art.shiftColorsInSprite(ceilTexture, 0xBFBFBF);
+			ceilTexture[0] = Art.shiftColorsInSprite(ceilTexture[0], 0xBFBFBF);
 			
 		}
 			
-		return ceilTexture;
+		return ceilTexture[0];
 		
 	}
 	

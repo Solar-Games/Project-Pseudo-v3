@@ -7,6 +7,8 @@ public class WaterBlock extends Block {
 
 	public WaterBlock() {
 		
+		//super(3, 1/12f, true);
+		
 		this.color = 0x0045ef;
 		this.floorTex = 1;
 		
@@ -20,7 +22,13 @@ public class WaterBlock extends Block {
 	
 	public double getWalkSpeed() {
 		
-		return 0.5;
+		return 0.025;
+		
+	}
+	
+	public double getFriction() {
+		
+		return 0.925;
 		
 	}
 	

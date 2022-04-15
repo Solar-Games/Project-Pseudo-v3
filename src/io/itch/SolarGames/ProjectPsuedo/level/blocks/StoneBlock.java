@@ -7,9 +7,9 @@ public class StoneBlock extends Block {
 		this.wall = wall;
 		this.blocksEntities = wall;
 		
-		this.floorTex = 3;
+		this.floorTex = 5;
 		this.wallTex = 0;
-		this.ceilTex = 3;
+		this.ceilTex = 5;
 		this.color = 0xBFBFBF;
 		
 	}

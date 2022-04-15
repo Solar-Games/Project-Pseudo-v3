@@ -15,7 +15,7 @@ public class EntityTree extends Entity {
 	
 	public EntityTree(Vector3 pos, Level level) {
 	
-		super(pos, 8, level, GameDisplay.entities.copySpriteFromSheet(2, 1, 16, 16, 16), 0x5D9F00);
+		super(pos, null, 8, level, GameDisplay.entities.copySpriteFromSheet(2, 1, 16, 16, 16), 0x5D9F00);
 
 	}
 	

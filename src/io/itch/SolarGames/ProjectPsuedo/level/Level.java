@@ -88,7 +88,13 @@ public class Level {
 		
 		for (Entity e : entities) {
 			
-			e.update(this);
+			e.update();
+			
+		}
+		
+		for (Block b : blocks) {
+			
+			b.update();
 			
 		}
 		

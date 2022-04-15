@@ -2,20 +2,24 @@ package io.itch.SolarGames.ProjectPsuedo.entities;
 
 import javax.swing.text.Position;
 
+import io.itch.SolarGames.ProjectPsuedo.Config;
 import io.itch.SolarGames.ProjectPsuedo.GameDisplay;
+import io.itch.SolarGames.ProjectPsuedo.Settings;
 import io.itch.SolarGames.ProjectPsuedo.gfx.Camera;
 import io.itch.SolarGames.ProjectPsuedo.inv.*;
 import io.itch.SolarGames.ProjectPsuedo.inv.armtype.*;
 import io.itch.SolarGames.ProjectPsuedo.level.Level;
+import io.itch.SolarGames.ProjectPsuedo.level.blocks.Block;
 import me.sjplus.SJEngine.input.Mouse;
+import me.sjplus.SJEngine.math.FVector2;
 import me.sjplus.SJEngine.math.MathUtil;
 import me.sjplus.SJEngine.math.Vector3;
 import me.sjplus.SJEngine.renderer.Sprite;
 import me.sjplus.SJEngine.util.Timer;
 
-public class Player extends Entity {
+public class Player extends Entity implements Camera {
 
-	private Camera camera;
+	public static final float fov = Settings.fov;
 	
 	public Item[] items;
 	public float defense;
@@ -28,12 +32,11 @@ public class Player extends Entity {
 	
 	private Timer timer;
 	
-	public Player(Camera camera, Level level) {
+	public Player(Vector3 pos, FVector2 rot, Level level) {
 	
-		super(camera.position, 8, level, GameDisplay.entities.copySpriteFromSheet(3, 1, 16, 16, 16), 0xffffff);
+		super(pos, rot, 8, level, null, 0xffffff);
 
-		this.camera = camera;
-		this.items = new Item[27];
+		this.items = new Item[24];
 		items[0] = Item.hand;
 		
 		addArmor(Armor.dragon_boots);
@@ -48,11 +51,22 @@ public class Player extends Entity {
 	
 	public void update(Mouse mouse) {
 		
-		pos.set(camera.position);
+		Block currentBlock = null;
+		
+		int tX = (int) (pos.x + 24) >> 4;
+		int tY = (int) (pos.z + 24) >> 4;
+		
+		currentBlock = level.getBlock(tX, tY);
+		currentBlock.onBlock(this);
+		
+		vel.multiply(currentBlock.getFriction(), 1, currentBlock.getFriction());
+		
+		pos.y = 4 + currentBlock.getBlockHeight();
+		rot.y = 30.5f;
 		
 		hotbar -= mouse.wheelIncrement;
 			
-		hotbar %= 9;
+		hotbar %= 8;
 		
 		if (hotbar < 0)
 			hotbar = 8;
@@ -67,14 +81,24 @@ public class Player extends Entity {
 		
 		defense = bd + cd + hd;
 		
-		updateItem();
+		updateInventory();
+		
+		move(Settings.movement()[0], Settings.movement()[1], currentBlock.getWalkSpeed() * speed);
+		
+		if (mouse.lock) {
+			
+			float yawResult = -(GameDisplay.width/2 - mouse.lastMouseX - 8) * GameDisplay.sens;
+			
+			rot.add(yawResult, 0);
+			
+		}
 		
 	}
 	
-	public void updateItem() {
+	public void updateInventory() {
 		
 		if (boots == Armor.dragon_boots)
-			speed = 0.75;
+			speed = 1.25;
 		
 	}
 	
@@ -199,6 +223,47 @@ public class Player extends Entity {
 	public Level getLevel() {
 		
 		return level;
+		
+	}
+
+	@Override
+	public void setPostion(double x, double y, double z) {
+	
+		pos.set(x, y, z);
+	
+	}
+
+	@Override
+	public void changePostion(double x, double y, double z) {
+	
+		pos.add(x, y, z);
+	
+	}
+
+	@Override
+	public void setRotation(float yaw, float pitch) {
+		
+		rot.set(yaw, pitch);
+		
+	}
+
+	@Override
+	public void changeRotation(float yaw, float pitch) {
+		
+		rot.add(yaw, pitch);
+		
+	}
+
+	public Vector3 getPos() {
+		
+		return pos;
+		
+	}
+	
+	@Override
+	public FVector2 getRot() {
+		
+		return rot;
 		
 	}
 	

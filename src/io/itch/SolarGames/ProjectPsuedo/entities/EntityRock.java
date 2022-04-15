@@ -14,7 +14,7 @@ public class EntityRock extends Entity {
 	
 	public EntityRock(Vector3 pos, Level level, Item item, int health, int color) {
 	
-		super(pos, 8, level, GameDisplay.entities.copySpriteFromSheet(1, 1, 16, 16, 16), color);
+		super(pos, null, 8, level, GameDisplay.entities.copySpriteFromSheet(1, 1, 16, 16, 16), color);
 		this.item = item;
 		this.health = health;
 	
