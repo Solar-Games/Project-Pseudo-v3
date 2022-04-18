@@ -14,7 +14,7 @@ public class UGWaterBlock extends WaterBlock {
 	
 	public Sprite getCeilTexture() {
 		
-		if (ceilTexture == null) {
+		if (ceilTexture[0] == null) {
 		
 			ceilTexture[0] = GameDisplay.tiles.copySpriteFromSheet((ceilTex % 8) + 1, (ceilTex / 8) + 1, 16, 16, 16);
 			

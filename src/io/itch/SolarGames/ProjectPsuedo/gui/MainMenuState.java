@@ -47,7 +47,7 @@ public class MainMenuState extends Screen {
 		
 			buttons[0].pressed = false;
 			
-			Generation.generateOverworldLevel(0, 64, 64, 150, 1800);
+			Generation.createTestLevel(0);
 			Generation.generateCavernLevel(1, Level.findLevel(0), 64, 64, 150, 1800);
 			
 			gs.setupGameState(new Level[] { Level.findLevel(0), Level.findLevel(1) });

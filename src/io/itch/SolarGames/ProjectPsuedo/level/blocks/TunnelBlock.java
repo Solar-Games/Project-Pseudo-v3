@@ -10,13 +10,13 @@ public class TunnelBlock extends Block {
 		
 		if (!up) {
 			
-			this.floorTex = 2;
+			this.floorTex = 4;
 			this.ceilTex = -1;
 			
 		} else {
 		
-			this.floorTex = 5;
-			this.ceilTex = 4;
+			this.floorTex = 7;
+			this.ceilTex = 6;
 
 		}
 			

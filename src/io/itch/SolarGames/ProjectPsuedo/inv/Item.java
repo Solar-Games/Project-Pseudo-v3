@@ -18,6 +18,7 @@ public class Item {
 	public static final Item steel_ore = new Item("Steel Ore", 3, 0x788F9F, true);
 	public static final Item iron_bar = new Item("Iron Bar", 2, 0xFFECDD, true);
 	public static final Item steel_bar = new Item("Steel Bar", 2, 0xA7C1CC, true);
+	public static final Item dragon_hide = new Item("Dragon Hide", 5, 0x52008C, true);
 
 	// tools
 	public static final Item hand = new Item("Hand", 0, 0xD98010, false);

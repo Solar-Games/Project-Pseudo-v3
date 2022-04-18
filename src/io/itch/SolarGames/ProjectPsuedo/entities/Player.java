@@ -1,21 +1,17 @@
 package io.itch.SolarGames.ProjectPsuedo.entities;
 
-import javax.swing.text.Position;
-
-import io.itch.SolarGames.ProjectPsuedo.Config;
-import io.itch.SolarGames.ProjectPsuedo.GameDisplay;
-import io.itch.SolarGames.ProjectPsuedo.Settings;
-import io.itch.SolarGames.ProjectPsuedo.gfx.Camera;
+import io.itch.SolarGames.ProjectPsuedo.*;
+import io.itch.SolarGames.ProjectPsuedo.gfx.*;
+import io.itch.SolarGames.ProjectPsuedo.gui.GameState;
 import io.itch.SolarGames.ProjectPsuedo.inv.*;
 import io.itch.SolarGames.ProjectPsuedo.inv.armtype.*;
-import io.itch.SolarGames.ProjectPsuedo.level.Level;
-import io.itch.SolarGames.ProjectPsuedo.level.blocks.Block;
-import me.sjplus.SJEngine.input.Mouse;
-import me.sjplus.SJEngine.math.FVector2;
-import me.sjplus.SJEngine.math.MathUtil;
-import me.sjplus.SJEngine.math.Vector3;
-import me.sjplus.SJEngine.renderer.Sprite;
-import me.sjplus.SJEngine.util.Timer;
+import io.itch.SolarGames.ProjectPsuedo.level.*;
+import io.itch.SolarGames.ProjectPsuedo.level.blocks.*;
+import me.sjplus.SJEngine.*;
+import me.sjplus.SJEngine.input.*;
+import me.sjplus.SJEngine.math.*;
+import me.sjplus.SJEngine.renderer.*;
+import me.sjplus.SJEngine.util.*;
 
 public class Player extends Entity implements Camera {
 
@@ -26,11 +22,18 @@ public class Player extends Entity implements Camera {
 	public Boots boots;
 	public Chestplate chestplate;
 	public Helmet helmet;
-	public double speed;
+	public double speed, friction;
 	public Item selectedItem;
 	public int hotbar = 0;
 	
 	private Timer timer;
+	private int useTime;
+	
+	private int tileX, tileY;
+	
+	public boolean used = false;
+	
+	private boolean alreadyPressed = false;
 	
 	public Player(Vector3 pos, FVector2 rot, Level level) {
 	
@@ -56,12 +59,15 @@ public class Player extends Entity implements Camera {
 		int tX = (int) (pos.x + 24) >> 4;
 		int tY = (int) (pos.z + 24) >> 4;
 		
+		tileX = tX;
+		tileY = tY;
+		
 		currentBlock = level.getBlock(tX, tY);
 		currentBlock.onBlock(this);
 		
-		vel.multiply(currentBlock.getFriction(), 1, currentBlock.getFriction());
+		vel.multiply(currentBlock.getFriction() + friction, 1, currentBlock.getFriction() + friction);
 		
-		pos.y = 4 + currentBlock.getBlockHeight();
+		pos.y = 2 + currentBlock.getBlockHeight();
 		rot.y = 30.5f;
 		
 		hotbar -= mouse.wheelIncrement;
@@ -93,13 +99,63 @@ public class Player extends Entity implements Camera {
 			
 		}
 		
+		if (useTime == 0) {
+		
+			if (mouse.mouseButtonDown[0] && !alreadyPressed) {
+				
+				useTime = 10;
+				
+				int cos = (int) Math.round(Math.cos(Math.toRadians(rot.x))),
+					sin = (int) Math.round(Math.sin(Math.toRadians(rot.x)));
+				
+				Entity e = null;
+				
+				if (level.getEntity(tX - 1, tY - 1) == null) {
+				
+					e = level.getEntity(tX - 1 + sin, tY - 1 + cos);
+				
+				}
+				
+				if (items[hotbar] != null && e != null) {
+					
+					e.use(this, items[hotbar]);
+					
+				}
+				
+			}
+		
+		} else {
+			
+			useTime--;
+			
+		}
+		
+		alreadyPressed = mouse.mouseButtonDown[0];
+		used = useTime > 0;
+		
+	}
+	
+	public void renderDebugGUI(Screen screen) {
+		
+		double cos = Math.round(Math.cos(Math.toRadians(rot.x))),
+				sin = Math.round(Math.sin(Math.toRadians(rot.x)));
+		
+		//SystemFont.draw("SX: " + (tileX + sin) + "SY: " + (tileY + cos), screen, 0, 0, 2.0f);
+		
 	}
 	
 	public void updateInventory() {
 		
-		if (boots == Armor.dragon_boots)
-			speed = 1.25;
-		
+		if (boots == Armor.dragon_boots) {
+			
+			speed = 1.75;
+			
+		} else {
+			
+			speed = 1;
+			
+		}
+			
 	}
 	
 	public boolean hasItem(Item item, int stack) {
@@ -265,6 +321,11 @@ public class Player extends Entity implements Camera {
 		
 		return rot;
 		
+	}
+
+	@Override
+	public void addRendering(Render3D r3d) {
+
 	}
 	
 }

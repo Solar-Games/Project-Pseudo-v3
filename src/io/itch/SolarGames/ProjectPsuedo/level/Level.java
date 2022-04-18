@@ -104,7 +104,7 @@ public class Level {
 		
 		for (Entity e : entities) {
 			
-			if ((int) e.getPos().x == x && (int) e.getPos().z == y)
+			if ((int) (e.getPos().x) >> 4 == x && (int) (e.getPos().z) >> 4 == y)
 				return e;
 			
 		}
@@ -115,10 +115,10 @@ public class Level {
 	
 	protected void createEntity(int x, int y, int col) {
 		
-		if (col == 0x5D9F00) addEntity(new EntityTree(new Vector3(x, 0, y), this));
-		if (col == 0xBFF0BF) addEntity(new EntityStoneRock(new Vector3(x, 0, y), this));
-		if (col == 0x353535) addEntity(new EntityStoneRock(new Vector3(x, 0, y), this));
-		if (col == 0x555555) addEntity(new EntityIronRock(new Vector3(x, 0, y), this));
+		if (col == 0x5D9F00) addEntity(new EntityTree(new Vector3(x * 16 - 16, 0, y * 16 - 16), this));
+		if (col == 0xBFF0BF) addEntity(new EntityStoneRock(new Vector3(x * 16 - 16, 0, y * 16 - 16), this));
+		if (col == 0x353535) addEntity(new EntityStoneRock(new Vector3(x * 16 - 16, 0, y * 16 - 16), this));
+		if (col == 0x555555) addEntity(new EntityIronRock(new Vector3(x * 16 - 16, 0, y * 16 - 16), this));
 		
 	}
 	
@@ -135,6 +135,8 @@ public class Level {
 		if (col == 0x878787) return new StoneBlock(true);
 		if (col == 0x555555) return new StoneBlock(false);
 		if (col == 0x385089) return new UGWaterBlock();
+		if (col == 0xFFC97F) return new WoodBlock(false);
+		if (col == 0xCC9F66) return new WoodBlock(true);
 		
 		return new Block();
 		

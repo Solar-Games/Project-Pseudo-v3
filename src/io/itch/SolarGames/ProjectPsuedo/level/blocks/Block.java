@@ -15,7 +15,7 @@ public class Block {
 	
 	protected boolean wall;
 	
-	protected boolean blocksEntities;
+	protected boolean blocksEntities = false;
 	
 	protected Timer timer = new Timer();
 	

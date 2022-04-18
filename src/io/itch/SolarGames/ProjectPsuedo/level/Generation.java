@@ -3,6 +3,7 @@ package io.itch.SolarGames.ProjectPsuedo.level;
 import java.util.Random;
 
 import io.itch.SolarGames.ProjectPsuedo.level.blocks.TunnelBlock;
+import me.sjplus.SJEngine.renderer.Sprite;
 
 public class Generation {
 
@@ -115,20 +116,19 @@ public class Generation {
 		
 	}
 	
+	public static final Sprite testlevel = new Sprite("testlvl.png");
+	
 	public static void createTestLevel(int id) {
 		
-		int[] genData = new int[128*128];
+		int[] genData = new int[64*64];
 		
 		for (int i = 0; i < genData.length; i++) {
 			
-			genData[i] = 0x00ff00;
-			
-			if (i % 128 == 63 && i / 128 == 63)
-				genData[i] = 0x00B200;
+			genData[i] = testlevel.pixels[i];
 			
 		}
 		
-		Level.createLevel(id, genData, 128, 128, false, 0xffffff);
+		Level.createLevel(id, genData, 64, 64, false, 0xffffff);
 		
 	}
 	

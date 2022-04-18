@@ -36,6 +36,10 @@ public class Render3D extends GameRenderer {
 			
 			renderFloor(camera, level);
 			
+			renderBlock16x3(2, 2, camera, GameDisplay.block_glyphs.get("test"));
+			
+			camera.addRendering(this);
+			
 			for (int i = 0; i < level.blocks.length; i++) {
 	
 				Block block = level.getBlock(i % level.getWidth(), i / level.getWidth());
@@ -58,8 +62,6 @@ public class Render3D extends GameRenderer {
 				fpostProcess(camera);
 			else
 				cpostProcess(camera);
-			
-			Settings.setChoppyFading(false);
 			
 			if (level.brightness != brightness)
 				brightness = level.brightness;
@@ -201,7 +203,7 @@ public class Render3D extends GameRenderer {
 	
 	public void renderSprite(Level level, Camera cam, Entity e) {
 		
-		renderSprite(((-e.getPos().x * 16)) + 8 / level.getWidth() * 2 + 16, e.getPos().y + 4, ((e.getPos().z * 16)) - 16, cam, e.getTexture());
+		renderSprite(-e.getPos().x, e.getPos().y + 4, e.getPos().z, cam, e.getTexture());
 		
 	}
 	
@@ -326,6 +328,90 @@ public class Render3D extends GameRenderer {
 		
 	}
 	
+	public void renderPlane(int x, double y, int z, Camera camera, Sprite sprite) {
+		
+		Vector3 pos = camera.getPos();
+		FVector2 rot = camera.getRot();
+		
+		double cos = Math.cos(Math.toRadians(rot.x)),
+				sin = Math.sin(Math.toRadians(rot.x));
+		
+		for (int y1 = 0; y1 < height; y1++) {
+			
+			double yD = (y1 - height / 2.0 + Math.sin(Math.toRadians(rot.y)) * 360) / Settings.fov;
+			
+			boolean floor = true;
+			double zD = (y + pos.y) / yD;
+			
+			if (yD < 0) {
+				
+				floor = false;
+				zD = -zD;
+				
+			}
+			
+			for (int x1 = 0; x1 < width; x1++) {
+				
+				if (zBuffer[x1+y1*width] <= zD) continue;
+				
+				double xD = (x1 - width / 2.0) / Settings.fov;
+				xD *= zD;
+				
+				double xx = xD * cos + zD * sin + (pos.x + 24);
+				double zz = zD * cos - xD * sin + (pos.z + 24);
+				
+				int xPix = (int) (xx);
+				int yPix = (int) (zz);
+				
+				int tX = xPix >> 4;
+				int tY = yPix >> 4;
+				
+				if ((int) (tX) != x || (int) (tY) != z || zz < 0 || xx < 0 || !floor)
+					continue;
+				
+				zBuffer[x1 + y1 * width] = zD;
+				pixels[x1 + y1 * width] = sprite.pixels[(xPix & 15) + (yPix & 15) * sprite.width];
+				
+			}
+			
+		}
+		
+	}
+	
+	public void renderBlock16x3(double x, double z, Camera camera, BlockGlyph bg) {
+		
+		if (bg != null) {
+			
+			renderPlane((int) x, 2, (int) z, camera, bg.parts[0]);
+			
+			renderWall(8 - (x * 16),
+					-16 + (z * 16) + 8,
+					(16 + 8) - (x * 16),
+					-16 + (z * 16) + 8,
+					-4 + 6, +12, camera, bg.parts[1]);
+			
+			renderWall((16 + 8) - (x * 16),
+					-16 + (z * 16) + 8,
+					(16 + 8) - (x * 16),
+					-16 + (z * 16) - 8,
+					-4 + 6, +12, camera, bg.parts[2]);
+			
+			renderWall((-8 - (x * 16)) + 32,
+					-16 + (z * 16) - 8,
+					(-(16 + 8) - (x * 16)) + 32,
+					-16 + (z * 16) - 8,
+					-4 + 6, +12, camera, bg.parts[3]);
+			
+			renderWall((-(16 + 8) - (x * 16)) + 32,
+					-16 + (z * 16) - 8,
+					(-(16 + 8) - (x * 16)) + 32,
+					-16 + (z * 16) + 8,
+					-4 + 6, +12, camera, bg.parts[4]);
+		
+		}
+		
+	}
+	
 	public void renderWall(double x, double z, Camera camera, Sprite sprite) {
 		
 		if (sprite != null) {
@@ -390,19 +476,13 @@ public class Render3D extends GameRenderer {
 		
 	}
 	
-	public void renderPlane(double x0, double z0, double x1, double z1, double y, Camera cam, Sprite sprite) {
-		
-		
-		
-	}
-	
 	public void fpostProcess(Camera cam) {
 		
 		for (int i = 0; i < zBuffer.length; i++) {
 			
-			if (zBuffer[i] > (696.4 / 4) * ((int) brightness & 0xff)/255) {
+			if (zBuffer[i] > (696.4 / 8) * ((int) brightness & 0xff)/255) {
 			
-				int yFade = 255 - (int) Math.min(MathUtil.clamp(zBuffer[i] - (696.4 / 4) * ((int) brightness & 0xff)/255, 0, 32) * 8, 255);
+				int yFade = 255 - (int) Math.min(MathUtil.clamp(zBuffer[i] - (696.4 / 8) * ((int) brightness & 0xff)/255, 0, 32) * 8, 255);
 				
 				int pixel = pixels[i];
 				

@@ -39,8 +39,8 @@ public abstract class Entity {
 	public void update() {
 		
 		pos.add(vel);
-		pos.set(MathUtil.clamp(pos.x, -24, level.getWidth() * 32 - 8), pos.y, MathUtil.clamp(pos.z, -24, level.getHeight() * 32 - 8));
-		
+		pos.set(MathUtil.clamp(pos.x, -24, level.getWidth() * 16 - 25), pos.y, MathUtil.clamp(pos.z, -24, level.getWidth() * 16 - 25));
+	
 	}
 	
 	public Vector3 getPos() {

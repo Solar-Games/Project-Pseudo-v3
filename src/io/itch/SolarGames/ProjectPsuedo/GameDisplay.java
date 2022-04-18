@@ -1,16 +1,16 @@
 package io.itch.SolarGames.ProjectPsuedo;
 
+import java.util.*;
+
 import io.itch.SolarGames.ProjectPsuedo.entities.Player;
+import io.itch.SolarGames.ProjectPsuedo.gfx.*;
 import io.itch.SolarGames.ProjectPsuedo.gui.*;
 import io.itch.SolarGames.ProjectPsuedo.inv.Item;
 import io.itch.SolarGames.ProjectPsuedo.level.Level;
 import me.sjplus.SJEngine.Display;
-import me.sjplus.SJEngine.Game;
-import me.sjplus.SJEngine.Game.LibraryIntro;
 import me.sjplus.SJEngine.ScreenHandler;
 import me.sjplus.SJEngine.renderer.*;
 import me.sjplus.SJEngine.sound.Sound;
-import me.sjplus.SJEngine.util.Logger;
 
 public class GameDisplay {
 
@@ -27,6 +27,8 @@ public class GameDisplay {
 	public static SpriteSheet items = new SpriteSheet("items.png");
 	public static SpriteSheet uicmpnts = new SpriteSheet("uicomp.png");
 	public static SpriteSheet walls = new SpriteSheet("walls.png");
+	
+	public static final Map<String, BlockGlyph> block_glyphs = new HashMap<>();
 	
 	public static final Sound rockSound = new Sound("rock.wav");
 	public static final Sound woodSound = new Sound("wood.wav");
@@ -53,6 +55,8 @@ public class GameDisplay {
 		
 		if (GameDisplay.class.getResource("/" + Settings.debug_test_texture_path[0] + 4 + ".png") != null)
 			skin = new SpriteSheet(Settings.debug_test_texture_path[0] + "4.png");
+		
+		block_glyphs.put("test", new BlockGlyph(0, 0, 0xffffff));
 		
 		Display d = new Display("Project Pseudo", width, height);
 		d.setClientRates(60, 144);

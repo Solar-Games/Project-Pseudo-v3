@@ -1,14 +1,15 @@
 package io.itch.SolarGames.ProjectPsuedo.entities;
 
 import io.itch.SolarGames.ProjectPsuedo.GameDisplay;
+import io.itch.SolarGames.ProjectPsuedo.inv.Drop;
 import io.itch.SolarGames.ProjectPsuedo.inv.Item;
 import io.itch.SolarGames.ProjectPsuedo.level.Level;
 import me.sjplus.SJEngine.math.Vector3;
 
-public class EntityIronRock extends EntityRock {
+public class EntityIronRock extends EntityResource {
 
 	public EntityIronRock(Vector3 pos, Level level) {
-		super(pos, level, Item.iron_ore, 30, 0xFFD1B2);
+		super(pos, level, 30, 0xFFD1B2, GameDisplay.rockSound, GameDisplay.entities.copySpriteFromSheet(1, 1, 16, 16, 16), new Drop(Item.iron_ore, 2, 5));
 	}
 
 	@Override
@@ -18,24 +19,7 @@ public class EntityIronRock extends EntityRock {
 		
 		if (item.equals(Item.stone_pick)) damage = 1;
 		
-		stage += damage;
-		
-		if (e instanceof Player && damage > 0)
-			GameDisplay.rockSound.play();
-		
-		if (stage >= health) {
-			
-			level.removeEntity(this);
-			
-			if (e instanceof Player) {
-				
-				Player player = ((Player) e);
-				
-				player.giveItem(this.item, 5);
-			
-			}
-		
-		}
+		super.use(e, damage);
 		
 	}
 	

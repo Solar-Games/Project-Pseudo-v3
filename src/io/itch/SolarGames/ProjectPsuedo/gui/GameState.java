@@ -1,29 +1,16 @@
 package io.itch.SolarGames.ProjectPsuedo.gui;
 
 import java.awt.event.KeyEvent;
-import java.awt.image.*;
-import java.io.File;
-import java.io.IOException;
-import java.util.Random;
-
-import javax.imageio.ImageIO;
 
 import io.itch.SolarGames.ProjectPsuedo.*;
-import io.itch.SolarGames.ProjectPsuedo.entities.Entity;
-import io.itch.SolarGames.ProjectPsuedo.entities.EntityTree;
 import io.itch.SolarGames.ProjectPsuedo.entities.Player;
 import io.itch.SolarGames.ProjectPsuedo.gfx.*;
-import io.itch.SolarGames.ProjectPsuedo.inv.Armor;
-import io.itch.SolarGames.ProjectPsuedo.inv.Item;
+import io.itch.SolarGames.ProjectPsuedo.inv.*;
 import io.itch.SolarGames.ProjectPsuedo.level.*;
-import io.itch.SolarGames.ProjectPsuedo.level.blocks.*;
 import me.sjplus.SJEngine.*;
 import me.sjplus.SJEngine.input.*;
-import me.sjplus.SJEngine.math.FVector2;
-import me.sjplus.SJEngine.math.MathUtil;
-import me.sjplus.SJEngine.math.Vector3;
+import me.sjplus.SJEngine.math.*;
 import me.sjplus.SJEngine.renderer.*;
-import me.sjplus.SJEngine.util.*;
 
 public class GameState extends Screen {
 
@@ -36,9 +23,6 @@ public class GameState extends Screen {
 	private boolean escAlreadyPressed;
 	private boolean invAlreadyPressed;
 	private boolean focus;
-	
-	private Timer timer;
-	private Entity lastEntity;
 	
 	public Player player;
 	public boolean startInv = false;
@@ -56,8 +40,6 @@ public class GameState extends Screen {
 		
 		inv = new Key(new int[] { KeyEvent.VK_E }, "Inventory");
 		esc = new Key(new int[] { KeyEvent.VK_ESCAPE }, "Escape");
-		
-		timer = new Timer();
 		
 	}
 
@@ -128,11 +110,6 @@ public class GameState extends Screen {
 		
 		SystemFont.draw("FPS: " + Game.fps, this, 0, 14, 2);
 		
-		int x = (int) Math.round(Math.sin(Math.toRadians(player.pos.x)));
-		int y = (int) Math.round(Math.cos(Math.toRadians(player.pos.x)));
-		
-		SystemFont.draw("RX: " + x + ", RY: " + y, this, 0, 28, 2);
-		
 		for (int i = 0; i < 3; i++) {
 			
 			for (int j = 0; j < 8; j++) {
@@ -157,10 +134,12 @@ public class GameState extends Screen {
 		}
 		
 		if (player.selectedItem != null)
-			this.scaledDraw(player.selectedItem.getTexture(Item.STATIC_TEXTURE + (itemUseLength > 0? 1 : 0)).createRenderFromSprite(), width - 16*(17 + (itemUseLength > 0? 2 : 0)), height - (int)(16*21) + 42, 16);
+			this.scaledDraw(player.selectedItem.getTexture(Item.STATIC_TEXTURE + (player.used? 1 : 0)).createRenderFromSprite(), width - 16*(17 + (itemUseLength > 0? 2 : 0)), height - (int)(16*21) + 42, 16);
 		
 		SystemFont.draw("Speed: " + (player.speed + 1), this, 1, height - (17 * 8), 2);
 		SystemFont.draw("Defense: " + player.defense, this, 1, height - (17 * 7), 2);
+		
+		player.renderDebugGUI(this);
 		
 	}
 

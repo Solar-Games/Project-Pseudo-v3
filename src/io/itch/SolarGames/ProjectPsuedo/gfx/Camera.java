@@ -17,5 +17,7 @@ public interface Camera {
 	public Vector3 getPos();
 	
 	public FVector2 getRot();
+	
+	public abstract void addRendering(Render3D r3D);
 		
 }
